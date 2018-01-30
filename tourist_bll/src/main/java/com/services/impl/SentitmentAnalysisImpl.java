@@ -1,5 +1,6 @@
 package com.services.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,9 +63,9 @@ public class SentitmentAnalysisImpl implements SentimentAnalysis {
 
 		// tockenize
 
-		String[] tokens = ptext.split(" ");
+		List<String> tokens = segment_suffix(ptext);
 
-		if (tokens.length == 0) {
+		if (tokens.size() == 0) {
 			return 0;
 		}
 
@@ -74,7 +75,7 @@ public class SentitmentAnalysisImpl implements SentimentAnalysis {
 			moy += getWordPolarity(it);
 		}
 
-		return moy / tokens.length;
+		return moy / tokens.size();
 	}
 
 	private double getWordPolarity(String pWord) {
@@ -91,10 +92,54 @@ public class SentitmentAnalysisImpl implements SentimentAnalysis {
 		return 0;
 	}
 
-	public void addWord(WordPolarity word) {
+	public String []segment_espace(String  phrase)
+	{
+		String [] seg=phrase.split(" ");
+		
+		
+		return seg;
+	}
+	public List<String> segment_separ(String  phrase)
+	{
+		String[] seg=this.segment_espace(phrase);
+		List<String> s=new ArrayList<String>();
+		for(int i=0;i<seg.length;i++)
+		{
+			s.add(seg[i]);
+		}
+		for(int i=0;i<s.size();i++)
+		{
+			if(s.get(i).equals("and")|| s.get(i).equals("or")||s.get(i).equals("this")||s.get(i).equals("that")||s.get(i).equals("these")||s.get(i).equals("those"))
+			{
+				s.remove(s.get(i));
+			}
+			else
+			{
+				
+			}
+		}
+		return s;
+		
+	}
+	public List<String> segment_suffix(String  phrase)
+	{
+		List<String> s=this.segment_separ(phrase);
+		
+		
+		for(int i=0;i<s.size();i++)
+		{
+		 if(s.get(i).substring(s.get(i).length()-2, s.get(i).length()).equals("ed")
+				 ||s.get(i).substring(s.get(i).length()-2, s.get(i).length()).equals("er")
+				 ||s.get(i).substring(s.get(i).length()-2, s.get(i).length()).equals("ee")
+				 ||s.get(i).substring(s.get(i).length()-2, s.get(i).length()).equals("al")
+				 ||s.get(i).substring(s.get(i).length()-2, s.get(i).length()).equals("en"))
+		 {  s.set(i, s.get(i).substring(0, s.get(i).length()-2));
+			 
+		 }
+		
+		}
 
-		wordPolDao.create(word);
-
+		return s;
 	}
 
 }
